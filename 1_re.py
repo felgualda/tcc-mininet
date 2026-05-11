@@ -32,7 +32,7 @@ class ExperimentoL3( IPTopo ):
         s1 = self.addSwitch('s1')
 
         # enlaces
-        lh1r0 = self.addLink(h1,r0)
+        lh1r0 = self.addLink(h1,r0, bw=100)
         lh1r0[h1].addParams(ip=("fd00:1::2/64"))
         lh1r0[r0].addParams(ip=("fd00:1::1/64"))
 
@@ -46,15 +46,15 @@ class ExperimentoL3( IPTopo ):
         lr1r2[r1].addParams(ip=("fd00:20::0/127"))
         lr1r2[r2].addParams(ip=("fd00:20::1/127"))
 
-        lr1r3 = self.addLink(r1,r3, bw=100)
+        lr1r3 = self.addLink(r1,r3, bw=50)
         lr1r3[r1].addParams(ip=("fd00:30::0/127"))
         lr1r3[r3].addParams(ip=("fd00:30::1/127"))
 
-        lr2r4 = self.addLink(r2,r4, bw=100)
+        lr2r4 = self.addLink(r2,r4, bw=100, delay="10ms")
         lr2r4[r2].addParams(ip=("fd00:40::0/127"))
         lr2r4[r4].addParams(ip=("fd00:40::1/127"))
 
-        lr3r4 = self.addLink(r3,r4, bw=100)
+        lr3r4 = self.addLink(r3,r4, bw=50)
         lr3r4[r3].addParams(ip=("fd00:50::0/127"))
         lr3r4[r4].addParams(ip=("fd00:50::1/127"))
 
@@ -71,6 +71,7 @@ def run():
     net.start()
 
     h1, h2 = net.get('h1', 'h2')
+    r0, r1, r2, r3, r4 = net.get('r0', 'r1', 'r2', 'r3', 'r4')
     #gateways
     h1.cmd('ip -6 route add default via fd00:1::1')
     h2.cmd('ip -6 route add default via fd00:2::1')
