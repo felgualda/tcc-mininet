@@ -4,6 +4,7 @@ from mininet.node import OVSController
 from mininet.node import Node
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
+from mininet.link import TCLink
 
 class LinuxRouter(Node):
     def config(self, **params):
@@ -39,20 +40,20 @@ class ExperimentoL3( Topo ):
         s1 = self.addSwitch('s1')
 
         # enlaces
-        self.addLink(h1,r0)
-        self.addLink(r0,s1)
-        self.addLink(s1,r1)
-        self.addLink(r1,r2)
-        self.addLink(r1,r3)
-        self.addLink(r2,r4)
-        self.addLink(r3,r4)
-        self.addLink(r4,h2)        
+        self.addLink(h1,r0, bw=100)
+        self.addLink(r0,s1, bw=100)
+        self.addLink(s1,r1, bw=100)
+        self.addLink(r1,r2, bw=100)
+        self.addLink(r1,r3, bw=100)
+        self.addLink(r2,r4, bw=100)
+        self.addLink(r3,r4, bw=100)
+        self.addLink(r4,h2, bw=100)        
 
 
 def run():
     topo = ExperimentoL3()
 
-    net = Mininet(topo=topo, controller=OVSController)
+    net = Mininet(topo=topo, controller=OVSController, link=TCLink)
 
     net.start()
 
