@@ -1,9 +1,12 @@
+import time
+
 from ipmininet.iptopo import IPTopo
 from ipmininet.ipnet import IPNet
 from ipmininet.cli import IPCLI
 from mininet.log import setLogLevel, info
 from mininet.node import OVSController
 from ipmininet.router.config import OSPF6, RouterConfig
+from ipmininet.srv6 import enable_srv6
 
 class ExperimentoL3( IPTopo ):
 
@@ -32,36 +35,40 @@ class ExperimentoL3( IPTopo ):
         s1 = self.addSwitch('s1')
 
         # enlaces
-        lh1r0 = self.addLink(h1,r0, bw=100)
+        lh1r0 = self.addLink(h1,r0, bw=100, igp_metric=1)
         lh1r0[h1].addParams(ip=("fd00:1::2/64"))
         lh1r0[r0].addParams(ip=("fd00:1::1/64"))
 
-        lr0s1 = self.addLink(r0,s1, bw=100)
+        lr0s1 = self.addLink(r0,s1, bw=100, igp_metric=1)
         lr0s1[r0].addParams(ip=("fd00:10::1/64"))
 
-        ls1r1 = self.addLink(s1,r1, bw=100)
+        ls1r1 = self.addLink(s1,r1, bw=100, igp_metric=1)
         ls1r1[r1].addParams(ip=("fd00:10::2/64"))
 
-        lr1r2 = self.addLink(r1,r2, bw=100)
+        lr1r2 = self.addLink(r1,r2, bw=100,igp_metric=1)
         lr1r2[r1].addParams(ip=("fd00:20::0/127"))
         lr1r2[r2].addParams(ip=("fd00:20::1/127"))
 
-        lr1r3 = self.addLink(r1,r3, bw=50)
+        lr1r3 = self.addLink(r1,r3, bw=50,igp_metric=2)
         lr1r3[r1].addParams(ip=("fd00:30::0/127"))
         lr1r3[r3].addParams(ip=("fd00:30::1/127"))
 
-        lr2r4 = self.addLink(r2,r4, bw=100, delay="10ms")
+        lr2r4 = self.addLink(r2,r4, bw=100, igp_metric=1, delay='10ms')
         lr2r4[r2].addParams(ip=("fd00:40::0/127"))
         lr2r4[r4].addParams(ip=("fd00:40::1/127"))
 
-        lr3r4 = self.addLink(r3,r4, bw=50)
+        lr3r4 = self.addLink(r3,r4, bw=50, igp_metric=2)
         lr3r4[r3].addParams(ip=("fd00:50::0/127"))
         lr3r4[r4].addParams(ip=("fd00:50::1/127"))
 
-        lr4h2 = self.addLink(r4,h2, bw=100)  
+        lr4h2 = self.addLink(r4,h2, bw=100, igp_metric=1)  
         lr4h2[r4].addParams(ip=("fd00:2::1/64"))   
         lr4h2[h2].addParams(ip=("fd00:2::2/64"))   
 
+    def post_build(self, net):
+        for n in net.hosts + net.routers:
+            enable_srv6(n)
+        return super().post_build(net)
 
 def run():
     topo = ExperimentoL3()
