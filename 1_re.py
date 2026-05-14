@@ -78,27 +78,37 @@ class ExperimentoL3( IPTopo ):
 
         super().build(*args, **kwargs)
 
+    def add_sr_policy(self, net, router, dest_subnet, sids_list, in_intf, out_intf, proto, port, table):
+        r = net[router]
+        subnet = dest_subnet
+
+        r.cmd(f'ip -6 route add {subnet} encap seg6 mode inline segs {sids_list} dev {out_intf} table {table}')
+
+        r.cmd(f'ip -6 rule add iif {in_intf} ipproto {proto} dport {port} lookup {table}')
+        pass
+         
     def post_build(self, net):
-            r0 = net["r0"]
-            h2_subnet = "fd00:2::/64"
             
-            sids = "2042:1:1::1,2042:3:3::34,2042:4:4::1" 
-
-            for r in ["r0", "r1", "r4"]:
-                net[r].cmd("sysctl -w net.ipv6.conf.all.seg6_enabled=1")
-                net[r].cmd("sysctl -w net.ipv6.conf.default.seg6_enabled=1")
-
-            r0.cmd(f'ip -6 route add {h2_subnet} encap seg6 mode inline segs {sids} via fd00:10::2 dev r0-eth1 table 100')
-
-            r0.cmd('ip -6 rule add iif r0-eth0 ipproto udp dport 5004 lookup 100')
-
-            self.tables["r3"] = LocalSIDTable(net["r3"], matching=[net["r3"].intf("lo")])
+            for n in net.hosts + net.routers:
+                 enable_srv6(n)
+            
+            self.add_sr_policy(net,
+                               'r0',
+                               "fd00:2::/64",
+                                "2042:1:1::1,2042:3:3::1,2042:4:4::1",
+                                'r0-eth0',
+                                'r0-eth1',
+                                'udp',
+                                '5004',
+                                '100')
+            '''self.tables["r3"] = LocalSIDTable(net["r3"], matching=[net["r3"].intf("lo")])
             
             SRv6EndXFunction(net=net, 
                             node="r3", 
                             to="2042:3:3::34", 
                             nexthop=net["r4"].intf("r4-eth1").ip6, 
                             table=self.tables["r3"])
+            '''
 
             return super().post_build(net)
         
