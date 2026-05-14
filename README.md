@@ -47,7 +47,7 @@ Logo, foram abertos individualmente os terminais dos hosts *H1*, *H2*, *R2* e *R
 
 No terminal do host *H2*, foi executado o comando ```iperf -s -V -u -p 5004```, para abrir um servidor *iperf* utilizando IPv6, através do protocolo UDP na porta 5004.
 
-Já no terminal do host *H1*, foi executado o comando ```iperf -c fd00:2::2 -V -u -p 5004 -t 5```, para invocar um cliente *iperf* utilizando IPv6, através do protocolo UDP na porta 5004, durante o tempo de 5 segundos.
+Já no terminal do host *H1*, foi executado o comando ```iperf -c fd00:2::2 -V -u -p 5004 -t 5 -l 1300```, para invocar um cliente *iperf* utilizando IPv6, através do protocolo UDP na porta 5004, durante o tempo de 5 segundos.
 
 ### Resultados obtidos
 
